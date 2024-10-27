@@ -116,23 +116,41 @@ async fn main() -> Result<(), Box<dyn Error>> {
         println!("No changes detected in the file.");
         return Ok(());
     }
-    let commit_message = generate_commit_message(&git_diff).await?;
-    println!("Generated commit message: {}", commit_message);
-    println!("What would you do like to do?");
-    println!("1.) Commit with this message");
-    println!("2.) Edit the message in the editor");
-    //println!("3.) Re-generate the message");
-    println!("4.) Abort");
+    loop {
+        let commit_message = generate_commit_message(&git_diff).await?;
 
-    io::stdout().flush()?;
-    let mut input = String::new();
-    io::stdin().read_line(&mut input)?;
-    match input.trim() {
-        "1" => make_commit(execution_dir.to_str().unwrap(), &commit_message, false)?,
-        "2" => make_commit(execution_dir.to_str().unwrap(), &commit_message, true)?,
-        //"3" => make_commit(execution_dir.to_str().unwrap(), &commit_message, true)?,
-        _ => println!("Commit aborted."),
+        println!("Generated commit message: {}", commit_message);
+        println!("What would you do like to do?");
+        println!("1.) Commit with this message");
+        println!("2.) Edit the message in the editor");
+        println!("3.) Re-generate the message");
+        println!("4.) Abort");
+
+        io::stdout().flush()?;
+
+        let mut input = String::new();
+
+        io::stdin().read_line(&mut input)?;
+
+        match input.trim() {
+            "1" => {
+                make_commit(execution_dir.to_str().unwrap(), &commit_message, false)?;
+                break;
+            }
+            "2" => {
+                make_commit(execution_dir.to_str().unwrap(), &commit_message, true)?;
+                break;
+            }
+            "3" => {
+                println!("Re-generating commit message...");
+                continue;
+            }
+            //"3" => make_commit(execution_dir.to_str().unwrap(), &commit_message, true)?,
+            _ => {
+                println!("Commit aborted.");
+                break;
+            }
+        }
     }
-
     Ok(())
 }
