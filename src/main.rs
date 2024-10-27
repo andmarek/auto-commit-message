@@ -1,3 +1,4 @@
+use colored::*;
 use dotenv::dotenv;
 use reqwest;
 use serde::{Deserialize, Serialize};
@@ -5,7 +6,7 @@ use std::env;
 use std::error::Error;
 use std::io::{self, Write};
 use std::path::PathBuf;
-use std::process::Command; // Add this line
+use std::process::Command;
 
 #[derive(Serialize)]
 struct GroqRequest {
@@ -119,7 +120,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     loop {
         let commit_message = generate_commit_message(&git_diff).await?;
 
-        println!("Generated commit message: {}", commit_message);
+        println!("Generated commit message: {}", commit_message.green());
         println!("What would you do like to do?");
         println!("1.) Commit with this message");
         println!("2.) Edit the message in the editor");
